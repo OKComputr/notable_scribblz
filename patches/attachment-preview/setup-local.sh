@@ -9,7 +9,7 @@
 #
 # Idempotent: safe to re-run if a step fails.
 
-set -euo pipefail
+set -eo pipefail
 
 NOTABLE_DIR="${1:-$HOME/notable-app}"
 PATCH_FILE="$(cd "$(dirname "$0")" && pwd)/0001-attachment-preview.patch"
@@ -25,21 +25,21 @@ step() { printf '\n\033[1;34m==>\033[0m %s\n' "$*"; }
 # ---------- 1. nvm + Node 16 ----------
 
 if ! [ -s "$HOME/.nvm/nvm.sh" ]; then
-  step "Installing nvm (one-time)…"
+  step "Installing nvm (one-time)..."
   curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 fi
 export NVM_DIR="$HOME/.nvm"
 # shellcheck disable=SC1091
 . "$NVM_DIR/nvm.sh"
 
-step "Installing/using Node 16 (v1.5.1 was written for Node 12-16)…"
+step "Installing/using Node 16 (v1.5.1 was written for Node 12-16)..."
 nvm install 16 >/dev/null
 nvm use 16
 
 # ---------- 2. Clone notable v1.5.1 ----------
 
 if [ ! -d "$NOTABLE_DIR/.git" ]; then
-  step "Cloning notable/notable into $NOTABLE_DIR…"
+  step "Cloning notable/notable into $NOTABLE_DIR..."
   git clone --quiet https://github.com/notable/notable.git "$NOTABLE_DIR"
 fi
 cd "$NOTABLE_DIR"
@@ -48,7 +48,7 @@ git checkout --quiet v1.5.1
 # ---------- 3. Apply feature patch ----------
 
 if git apply --check "$PATCH_FILE" >/dev/null 2>&1; then
-  step "Applying attachment-preview feature patch…"
+  step "Applying attachment-preview feature patch..."
   git apply "$PATCH_FILE"
 elif git apply --check --reverse "$PATCH_FILE" >/dev/null 2>&1; then
   step "Feature patch already applied; skipping."
@@ -59,7 +59,7 @@ fi
 
 # ---------- 4. Environment workarounds ----------
 
-step "Patching package.json (deleted forks → published versions)…"
+step "Patching package.json (deleted forks → published versions)..."
 node - <<'NODEEOF'
 const fs = require('fs');
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -72,29 +72,29 @@ pkg.overrides = Object.assign({}, pkg.overrides, {
 fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 NODEEOF
 
-step "Fixing asciimath2tex import (package layout changed)…"
+step "Fixing asciimath2tex import (package layout changed)..."
 sed -i.bak "s|asciimath2tex/asciimath2tex\\.js|asciimath2tex|" \
   src/renderer/utils/asciimath.ts
 rm -f src/renderer/utils/asciimath.ts.bak
 
-step "Configuring git URL rewrites for old ssh+git:// transitives…"
+step "Configuring git URL rewrites for old ssh+git:// transitives..."
 git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/" 2>/dev/null || true
 git config --global --add url."https://github.com/".insteadOf "git://github.com/"        2>/dev/null || true
 
 # ---------- 5. npm install ----------
 
-step "npm install (this takes a few minutes)…"
+step "npm install (this takes a few minutes)..."
 rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps --no-audit --no-fund
 
 # ---------- 6. node_modules patches ----------
 
-step "Disabling fork-ts-checker (modern @types reject older code)…"
+step "Disabling fork-ts-checker (modern @types reject older code)..."
 sed -i.bak 's|if (isTranspileOnly && !configurator.isTest)|if (false \&\& isTranspileOnly \&\& !configurator.isTest)|' \
   node_modules/electron-webpack/out/configurators/ts.js
 rm -f node_modules/electron-webpack/out/configurators/ts.js.bak
 
-step "Stubbing electron-updater (avoids fs/promises issue on Electron 5)…"
+step "Stubbing electron-updater (avoids fs/promises issue on Electron 5)..."
 cat > node_modules/electron-updater/out/main.js <<'JSEOF'
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -124,7 +124,7 @@ JSEOF
 
 # ---------- 7. Build prerequisites ----------
 
-step "Building prerequisites…"
+step "Building prerequisites..."
 mkdir -p src/renderer/template/dist/css src/renderer/template/dist/javascript
 
 if ! npm run svelto:dev >/tmp/svelto.log 2>&1; then
@@ -139,10 +139,10 @@ npm run tutorial
 
 # ---------- 8. cash-dom + svelto plugin shim ----------
 
-step "Writing cash-dom + svelto plugin shim (replaces notable.min.js)…"
+step "Writing cash-dom + svelto plugin shim (replaces notable.min.js)..."
 cat > src/renderer/template/dist/javascript/notable.min.js <<'JSEOF'
 // cash-dom + svelto plugin no-op shim. Replaces the svelto-built notable.min.js.
-// Svelto's plugins (.layoutResizable, .modal, .popover, …) become chainable
+// Svelto's plugins (.layoutResizable, .modal, .popover, ...) become chainable
 // no-ops so React mounting succeeds.
 var $ = require('cash-dom');
 $ = $.default || $;
@@ -196,7 +196,7 @@ Once running, create a note containing:
 
     [screenshot.png](@attachment/screenshot.png)
 
-…drop a PNG named screenshot.png into the attachments/ subdirectory of your
+...drop a PNG named screenshot.png into the attachments/ subdirectory of your
 data folder, and the preview pane shows it inline. That's the patch.
 
 The UI chrome will look unstyled — that's the stubbed CSS bypassing the
