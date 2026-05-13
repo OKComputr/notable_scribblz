@@ -31,7 +31,6 @@ export function NoteList() {
   const setSearch = useStore(s => s.setSearch);
   const sort = useStore(s => s.sort);
   const setSort = useStore(s => s.setSort);
-  const workspace = useStore(s => s.workspace);
   const searchRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -58,10 +57,6 @@ export function NoteList() {
   }, [notes, search, activeTag, showFavorites, showTrash, sort]);
 
   async function newNote() {
-    if (!workspace) {
-      await window.notable.workspace.pickFolder();
-      return;
-    }
     const note = await window.notable.notes.create('Untitled');
     setSelected(note.filePath);
   }
@@ -98,9 +93,7 @@ export function NoteList() {
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {visible.length === 0 && (
           <div className="text-center opacity-60 mt-12 text-sm px-6">
-            {workspace
-              ? (notes.length === 0 ? 'No notes yet. Click + to start.' : 'No matches.')
-              : 'Pick a notes folder to begin.'}
+            {notes.length === 0 ? 'No notes yet. Click + to start.' : 'No matches.'}
           </div>
         )}
         {visible.map(n => (

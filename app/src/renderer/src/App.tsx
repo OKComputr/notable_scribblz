@@ -52,12 +52,6 @@ export default function App() {
     }
   });
   useMenuCommand('cmd:new-note', async () => {
-    const current = useStore.getState().workspace;
-    if (!current) {
-      const ws = await window.notable.workspace.pickFolder();
-      if (!ws) return;
-      setWorkspace(ws);
-    }
     const note = await window.notable.notes.create('Untitled');
     setSelected(note.filePath);
   });

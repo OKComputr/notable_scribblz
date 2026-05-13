@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import chokidar, { type FSWatcher } from 'chokidar';
@@ -55,11 +55,17 @@ function requireWorkspace(): Workspace {
   return workspace;
 }
 
+function defaultWorkspaceDir(): string {
+  return join(app.getPath('documents'), 'Notable Modern');
+}
+
 export async function initWorkspaceFromSettings(): Promise<void> {
   const s = await loadSettings();
-  if (s.dataDir) {
-    try { await setWorkspaceFromDir(s.dataDir); }
-    catch (err) { console.error('Failed to restore workspace', err); }
+  const dir = s.dataDir ?? defaultWorkspaceDir();
+  try {
+    await setWorkspaceFromDir(dir);
+  } catch (err) {
+    console.error('Failed to open workspace', err);
   }
 }
 
