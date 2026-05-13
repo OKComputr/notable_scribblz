@@ -70,6 +70,18 @@ attachment) and "After" (inline `<img>`).
 
 ### Option 2 — Full Notable v1.5.1 build with the patch applied
 
+#### 2a — macOS one-liner (recommended)
+
+```sh
+bash patches/attachment-preview/setup-local.sh
+```
+
+That script installs Node 16 via nvm, clones [`notable/notable@v1.5.1`](https://github.com/notable/notable/tree/v1.5.1) into `~/notable-app`, applies the feature patch, applies every environment workaround documented below, builds prerequisites, and prints the launch command. Pass a directory as the first argument to override the install location.
+
+Tested on Apple Silicon — Electron 5 has no native arm64 build, so macOS will prompt to install Rosetta 2 on first launch. Accept.
+
+#### 2b — Step by step
+
 You'll need Node 12-16 (I used Node 16.20.2 via nvm).
 
 ```bash
