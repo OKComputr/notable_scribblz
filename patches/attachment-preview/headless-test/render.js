@@ -13,8 +13,10 @@
 
 const showdown = require('showdown');
 const path = require('path');
+const fs = require('fs');
 
-const attachmentsPath = '/tmp/notable-test/fixtures/attachments';
+const attachmentsPath = path.join(__dirname, 'fixtures', 'attachments');
+const outPath = path.join(__dirname, 'preview.html');
 const token = '@attachment';
 
 function encodeFilePath (p) { return p.split('/').map(encodeURIComponent).join('/'); }
@@ -139,5 +141,5 @@ const page = `<!doctype html><meta charset="utf-8"><title>Notable attachment pre
 <div class="preview"><div class="label">Before — Option B not applied</div>${htmlBefore}</div>
 <div class="preview"><div class="label">After — Option B applied (image attachment renders inline)</div>${htmlAfter}</div>`;
 
-require('fs').writeFileSync('/tmp/notable-test/preview.html', page);
-console.log('\nWrote /tmp/notable-test/preview.html');
+fs.writeFileSync(outPath, page);
+console.log('\nWrote ' + outPath);
