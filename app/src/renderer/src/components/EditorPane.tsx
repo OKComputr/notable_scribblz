@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Editor } from './Editor';
-import { Preview } from './Preview';
 import { useStore } from '@renderer/store/app';
-import { EditIcon, EyeIcon, PaperclipIcon, SplitIcon, StarFilledIcon, StarIcon, TrashIcon } from './icons';
+import { PaperclipIcon, StarFilledIcon, StarIcon, TrashIcon } from './icons';
 import { useMenuCommand } from '@renderer/hooks/useMenuCommand';
 import type { Note } from '@shared/types';
 import { IMAGE_EXTS } from '@shared/types';
@@ -17,8 +16,6 @@ export function EditorPane() {
   const selectedPath = useStore(s => s.selectedPath);
   const notes = useStore(s => s.notes);
   const settings = useStore(s => s.settings);
-  const viewMode = useStore(s => s.viewMode);
-  const setViewMode = useStore(s => s.setViewMode);
   const setSelected = useStore(s => s.setSelected);
 
   const note = notes.find(n => n.filePath === selectedPath) ?? null;
@@ -113,8 +110,6 @@ export function EditorPane() {
     );
   }
 
-  const themeForEditor = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
-
   return (
     <section className="flex-1 flex flex-col h-full min-w-0" style={{ background: 'var(--color-main)' }}>
       <div
@@ -133,8 +128,6 @@ export function EditorPane() {
           {note.metadata.favorited ? <StarFilledIcon className="text-yellow-500" /> : <StarIcon />}
         </button>
         <button onClick={trash}    title="Move to trash"               className="p-1 rounded hover:bg-black/5 dark:hover:bg-white/10"><TrashIcon /></button>
-        <div className="w-px h-5" style={{ background: 'var(--color-border)' }} />
-        <ViewToggle viewMode={viewMode} onChange={setViewMode} />
       </div>
 
       <div className="px-3 py-2 border-b flex items-center gap-2 flex-wrap text-xs" style={{ borderColor: 'var(--color-border)' }}>
@@ -159,54 +152,14 @@ export function EditorPane() {
       </div>
 
       <div className="flex-1 min-h-0">
-        {viewMode === 'editor'  && <div className="h-full"><Editor
-            value={draft}
-            onChange={onContentChange}
-            theme={themeForEditor}
-            wordWrap={settings?.editorWordWrap   ?? 'on'}
-            fontSize={settings?.fontSize         ?? 14}
-            tabSize={settings?.editorTabSize     ?? 2}
-            showLineNumbers={settings?.showLineNumbers ?? true}
-          /></div>}
-        {viewMode === 'preview' && <Preview source={draft} theme={themeForEditor} />}
-        {viewMode === 'split'   && (
-          <div className="grid grid-cols-2 h-full">
-            <div className="border-r" style={{ borderColor: 'var(--color-border)' }}>
-              <Editor
-                value={draft}
-                onChange={onContentChange}
-                theme={themeForEditor}
-                wordWrap={settings?.editorWordWrap   ?? 'on'}
-                fontSize={settings?.fontSize         ?? 14}
-                tabSize={settings?.editorTabSize     ?? 2}
-                showLineNumbers={settings?.showLineNumbers ?? true}
-              />
-            </div>
-            <Preview source={draft} theme={themeForEditor} />
-          </div>
-        )}
+        <Editor
+          value={draft}
+          onChange={onContentChange}
+          wordWrap={settings?.editorWordWrap   ?? 'on'}
+          fontSize={settings?.fontSize         ?? 15}
+          showLineNumbers={false}
+        />
       </div>
     </section>
-  );
-}
-
-function ViewToggle({ viewMode, onChange }: { viewMode: 'split' | 'editor' | 'preview'; onChange: (m: 'split' | 'editor' | 'preview') => void }) {
-  function btn(target: 'split' | 'editor' | 'preview', icon: React.ReactNode, label: string) {
-    return (
-      <button
-        title={label}
-        onClick={() => onChange(target)}
-        className={`p-1 rounded ${viewMode === target ? 'bg-black/10 dark:bg-white/15' : 'hover:bg-black/5 dark:hover:bg-white/10'}`}
-      >
-        {icon}
-      </button>
-    );
-  }
-  return (
-    <div className="flex items-center">
-      {btn('editor',  <EditIcon  />, 'Editor only')}
-      {btn('split',   <SplitIcon />, 'Split view')}
-      {btn('preview', <EyeIcon   />, 'Preview only')}
-    </div>
   );
 }
