@@ -88,6 +88,23 @@ git config --global --add url."https://github.com/".insteadOf "git://github.com/
 export npm_config_arch=x64
 export npm_config_platform=darwin
 
+# node-sass (transitive via svelto) shells out to `python` — macOS 12+ no longer
+# ships Python 2, only `python3`. Create a shim if `python` is missing.
+if ! command -v python >/dev/null 2>&1; then
+  if command -v python3 >/dev/null 2>&1; then
+    step "Creating python -> python3 shim for node-sass's native build..."
+    SHIM_DIR="$HOME/.notable-build-shims"
+    mkdir -p "$SHIM_DIR"
+    ln -sf "$(command -v python3)" "$SHIM_DIR/python"
+    export PATH="$SHIM_DIR:$PATH"
+    export PYTHON="$SHIM_DIR/python"
+  else
+    echo "    Neither python nor python3 found. Install Xcode Command Line Tools:" >&2
+    echo "      xcode-select --install" >&2
+    exit 1
+  fi
+fi
+
 step "npm install (this takes a few minutes; pulling Electron 5 darwin-x64)..."
 rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps --no-audit --no-fund
