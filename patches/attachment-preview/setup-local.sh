@@ -69,6 +69,12 @@ pkg.overrides = Object.assign({}, pkg.overrides, {
   'caporal' : '^1.4.0',
   'gulp-if' : '^3.0.0'
 });
+// svelto pulls in pacco -> node-sass, whose native build invokes
+// /usr/bin/python (Apple's removed Python 2 stub). We stub svelto's output
+// anyway, so just remove it (+ pacco) from the deps. Without svelto in the
+// tree, node-sass never gets installed and the broken build chain disappears.
+delete pkg.devDependencies['svelto'];
+delete pkg.devDependencies['pacco'];
 fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 NODEEOF
 
