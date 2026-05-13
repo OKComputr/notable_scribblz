@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "outDir": "./node_modules/.tmp/web",
+    "types": ["vite/client"],
+    "paths": {
+      "@renderer/*": ["./src/renderer/src/*"],
+      "@shared/*":   ["./src/shared/*"]
+    },
+    "baseUrl": "."
+  },
+  "include": ["src/renderer/src/**/*", "src/shared/**/*"]
+}

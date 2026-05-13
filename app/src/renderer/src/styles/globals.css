@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'katex/dist/katex.min.css';
+@import 'prismjs/themes/prism-tomorrow.css';
+
+:root {
+  --color-bg:        #f7f7f7;
+  --color-fg:        #1f1f1f;
+  --color-muted:     #6b7280;
+  --color-accent:    #2a6ed4;
+  --color-sidebar:   #202a2f;
+  --color-sidebar-fg:#e6e6e6;
+  --color-middle:    #ffffff;
+  --color-main:      #f7f7f7;
+  --color-border:    #dedede;
+  --color-border-strong: #c5c5c5;
+  --color-card:      #ffffff;
+  --color-input-bg:  #ffffff;
+  --color-hover:     #f0f0f0;
+  --color-selected:  #d8e7ff;
+  --color-selected-fg: #1f1f1f;
+}
+
+.theme-dark {
+  --color-bg:        #0f0f0f;
+  --color-fg:        #f6f6f6;
+  --color-muted:     #9aa0a6;
+  --color-accent:    #4c8df6;
+  --color-sidebar:   #0a0a0a;
+  --color-sidebar-fg:#e6e6e6;
+  --color-middle:    #161616;
+  --color-main:      #0f0f0f;
+  --color-border:    #2a2a2a;
+  --color-border-strong: #3a3a3a;
+  --color-card:      #1a1a1a;
+  --color-input-bg:  #1f1f1f;
+  --color-hover:     #1f1f1f;
+  --color-selected:  #1d3a66;
+  --color-selected-fg: #ffffff;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { color: inherit; }
+input, textarea, select { background: var(--color-input-bg); color: var(--color-fg); }
+hr { border-color: var(--color-border); }
+
+/* ---------- Preview pane ---------- */
+.markdown-body {
+  line-height: 1.65;
+  font-size: 15px;
+  word-wrap: break-word;
+}
+.markdown-body h1 { font-size: 1.8em; margin: 0.5em 0 0.4em; font-weight: 700; }
+.markdown-body h2 { font-size: 1.5em; margin: 1.0em 0 0.4em; font-weight: 700; border-bottom: 1px solid var(--color-border); padding-bottom: 0.2em; }
+.markdown-body h3 { font-size: 1.2em; margin: 1.0em 0 0.4em; font-weight: 700; }
+.markdown-body h4, .markdown-body h5, .markdown-body h6 { margin: 1em 0 0.3em; font-weight: 700; }
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body blockquote { margin: 0 0 1em; }
+.markdown-body ul, .markdown-body ol { padding-left: 1.4em; }
+.markdown-body ul ul, .markdown-body ol ol, .markdown-body ul ol, .markdown-body ol ul { margin-bottom: 0; }
+.markdown-body li { margin: 0.15em 0; }
+.markdown-body blockquote {
+  border-left: 3px solid var(--color-border-strong);
+  padding: 0.1em 0.9em;
+  color: var(--color-muted);
+}
+.markdown-body code {
+  font-family: ui-monospace, SF Mono, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.92em;
+  background: var(--color-hover);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.markdown-body pre {
+  background: #1f1f1f;
+  color: #f8f8f2;
+  padding: 14px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.45;
+}
+.markdown-body pre code { background: transparent; padding: 0; font-size: inherit; color: inherit; }
+.markdown-body a { color: var(--color-accent); text-decoration: none; }
+.markdown-body a:hover { text-decoration: underline; }
+.markdown-body table {
+  border-collapse: collapse;
+  margin: 0.6em 0 1.4em;
+  font-size: 0.95em;
+}
+.markdown-body th, .markdown-body td {
+  border: 1px solid var(--color-border);
+  padding: 6px 10px;
+}
+.markdown-body th { background: var(--color-hover); font-weight: 600; }
+.markdown-body img,
+.markdown-body img.attachment {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 0.4em 0;
+  display: block;
+}
+.markdown-body .attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  margin: 4px 4px 4px 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-card);
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.95em;
+}
+.markdown-body .attachment-link:hover { background: var(--color-hover); }
+.markdown-body .attachment-link::before {
+  content: '📎';
+  font-size: 0.9em;
+}
+.markdown-body .task-list-item { list-style: none; margin-left: -1.2em; }
+.markdown-body .task-list-item input[type=checkbox] { margin-right: 0.4em; }
+.markdown-body .mermaid svg { max-width: 100%; }
+
+.scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+
+.titlebar-drag { -webkit-app-region: drag; }
+.titlebar-drag :where(input, button, a, [role=button]) { -webkit-app-region: no-drag; }

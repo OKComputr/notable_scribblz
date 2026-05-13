@@ -1,0 +1,8 @@
+node_modules
+out
+release
+.vite
+.eslintcache
+*.log
+.DS_Store
+.tmp
