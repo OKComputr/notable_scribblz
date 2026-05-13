@@ -83,7 +83,12 @@ git config --global --add url."https://github.com/".insteadOf "git://github.com/
 
 # ---------- 5. npm install ----------
 
-step "npm install (this takes a few minutes)..."
+# Electron 5.0.13 has no darwin-arm64 build (released May 2019, pre-M1).
+# Force the x64 binary; Rosetta 2 handles execution at runtime.
+export npm_config_arch=x64
+export npm_config_platform=darwin
+
+step "npm install (this takes a few minutes; pulling Electron 5 darwin-x64)..."
 rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps --no-audit --no-fund
 
