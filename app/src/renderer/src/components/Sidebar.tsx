@@ -44,7 +44,7 @@ export function Sidebar() {
       className="flex flex-col h-full text-sm select-none scrollbar-thin overflow-y-auto"
       style={{ background: 'var(--color-sidebar)', color: 'var(--color-sidebar-fg)' }}
     >
-      <div className="titlebar-drag flex items-center justify-between px-4 h-10 border-b border-black/20">
+      <div className="titlebar-drag traffic-lights-spacer flex items-center justify-between px-4 h-10 border-b border-black/20">
         <span className="font-semibold">Notable</span>
         <button
           aria-label="Toggle theme"

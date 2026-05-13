@@ -140,3 +140,8 @@ hr { border-color: var(--color-border); }
 
 .titlebar-drag { -webkit-app-region: drag; }
 .titlebar-drag :where(input, button, a, [role=button]) { -webkit-app-region: no-drag; }
+
+/* On macOS the hidden-inset title bar leaves the traffic-light buttons
+   floating over the top-left of the window. Reserve space for them so they
+   don't overlap the sidebar header. */
+body.platform-mac .traffic-lights-spacer { padding-left: 80px; }
