@@ -2,10 +2,21 @@ import { promises as fs } from 'node:fs';
 import { existsSync } from 'node:fs';
 import { basename, extname, join } from 'node:path';
 import matter from 'gray-matter';
-import filenamify from 'filenamify';
 import type { Note, NoteMetadata, Workspace, Attachment } from '@shared/types';
 
 const TRASH_DIRNAME = '.trash';
+
+// Replaces characters that are illegal in filenames on macOS / Windows / Linux
+// with `-`, strips leading dots, and trims to a reasonable length. Replaces the
+// `filenamify` package, which is ESM-only and incompatible with Electron's
+// CommonJS main bundle.
+function sanitizeFileName(input: string): string {
+  return input
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '-')
+    .replace(/^\.+/, '_')
+    .trim()
+    .slice(0, 120) || 'untitled';
+}
 
 function isoNow(): string {
   return new Date().toISOString();
@@ -95,7 +106,7 @@ export async function writeNote(note: Note): Promise<Note> {
 }
 
 function safeFileName(title: string): string {
-  return filenamify(title, { replacement: '-' }).slice(0, 120) || 'untitled';
+  return sanitizeFileName(title);
 }
 
 async function uniqueNotePath(ws: Workspace, title: string): Promise<{ filePath: string; fileName: string }> {
@@ -171,7 +182,7 @@ export async function importAttachments(ws: Workspace, paths: string[]): Promise
   const out: Attachment[] = [];
   for (const src of paths) {
     const name = basename(src);
-    const safe = filenamify(name, { replacement: '-' });
+    const safe = sanitizeFileName(name);
     let dest = join(ws.attachmentsDir, safe);
     if (existsSync(dest)) {
       const ext = extname(safe);
