@@ -1,0 +1,69 @@
+diff --git a/src/renderer/containers/main/note.ts b/src/renderer/containers/main/note.ts
+index 15ad8cb..41e4b98 100644
+--- a/src/renderer/containers/main/note.ts
++++ b/src/renderer/containers/main/note.ts
+@@ -322,6 +322,9 @@ class Note extends Container<NoteState, MainCTX> {
+ 
+     if ( !filePaths.length ) return;
+ 
++    const IMAGE_EXTS = new Set ([ 'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif', 'bmp', 'ico' ]);
++    const addedFileNames: string[] = [];
++
+     const nextNote = _.cloneDeep ( note );
+ 
+     for ( let srcPath of filePaths ) {
+@@ -344,10 +347,22 @@ class Note extends Container<NoteState, MainCTX> {
+ 
+       nextNote.metadata.attachments = Attachments.sort ( nextNote.metadata.attachments );
+ 
++      addedFileNames.push ( attachment.fileName );
++
+     }
+ 
+     await this.write ( nextNote );
+ 
++    const markdownSnippets = addedFileNames.map ( fileName => {
++      const ext = path.extname ( fileName ).slice ( 1 ).toLowerCase ();
++      const prefix = IMAGE_EXTS.has ( ext ) ? '!' : '';
++      return `${prefix}[${fileName}](${Config.attachments.token}/${fileName})`;
++    });
++
++    if ( markdownSnippets.length && this.ctx.editor.isEditing () ) {
++      this.ctx.editor._replaceSelectedText ( `\n\n${markdownSnippets.join ( '\n\n' )}\n`, true );
++    }
++
+   }
+ 
+   _removeAttachment = ( note: NoteObj | undefined = this.state.note, attachment: AttachmentObj ) => { // Just remove the attachment from the note //UGLY
+diff --git a/src/renderer/utils/markdown.ts b/src/renderer/utils/markdown.ts
+index 5e9f28b..fe31de8 100644
+--- a/src/renderer/utils/markdown.ts
++++ b/src/renderer/utils/markdown.ts
+@@ -396,6 +396,8 @@ const Markdown = {
+ 
+       if ( !attachmentsPath ) return [];
+ 
++      const IMAGE_EXTS = new Set ([ 'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif', 'bmp', 'ico' ]);
++
+       return [
+         { // <img>, <source>
+           type: 'output',
+@@ -406,6 +408,18 @@ const Markdown = {
+             return `<${$1}${$2}src="file://${encodeFilePath ( filePath )}" class="attachment" data-filename="${$3}"${$4}>`;
+           }
+         },
++        { // Image link → inline <img> (image attachments referenced via [name](@attachment/foo.png))
++          type: 'output',
++          regex: `<a(.*?)href="${token}/([^"]+)"(.*?)>(.*?)</a>`,
++          replace ( match, $1, $2, $3, $4 ) {
++            const ext = path.extname ( $2 ).slice ( 1 ).toLowerCase ();
++            if ( !IMAGE_EXTS.has ( ext ) ) return match;
++            const decoded = decodeURI ( $2 );
++            const basename = path.basename ( decoded );
++            const filePath = path.join ( attachmentsPath, decoded );
++            return `<img src="file://${encodeFilePath ( filePath )}" alt="${basename}" class="attachment" data-filename="${decoded}">`;
++          }
++        },
+         { // Link Button
+           type: 'output',
+           regex: `<a(.*?)href="${token}/([^"]+)"(.*?)></a>`,
